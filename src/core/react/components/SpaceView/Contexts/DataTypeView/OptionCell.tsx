@@ -155,7 +155,7 @@ export const OptionCell = (
     } else {
       props.saveOptions(
         serializeOptionValue(newOptions, parsedValue),
-        serializeMultiDisplayString(newValues)
+        newValues[0] ?? ""
       );
     }
   };
@@ -168,7 +168,7 @@ export const OptionCell = (
     } else {
       props.saveOptions(
         serializeOptionValue(options, parsedValue),
-        serializeMultiDisplayString(value)
+        value[0] ?? ""
       );
     }
   };

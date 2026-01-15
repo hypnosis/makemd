@@ -96,7 +96,8 @@ export const PropertiesView = (props: {
     if (properties) {
       newCols.push(...cols);
       fmKeys.forEach((c) => {
-        newValues[c] = parseProperty(c, properties[c]);
+        const colType = cols.find((col) => col.name == c)?.type;
+        newValues[c] = parseProperty(c, properties[c], colType);
       });
     }
 
