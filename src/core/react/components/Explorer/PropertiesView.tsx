@@ -86,7 +86,8 @@ export const PropertiesView = (props: {
     ]).filter((f) => !columns.some((g) => g.name == f));
     const cols: SpaceTableColumn[] = fmKeys.map(
       (f) =>
-        tableData?.cols?.find((g) => g.name == f) ?? {
+        tableData?.cols?.find((g) => g.name == f) ??
+        columns.find((g) => g.name == f) ?? {
           table: "",
           name: f,
           schemaId: "",
