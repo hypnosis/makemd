@@ -73,7 +73,7 @@
   .workspace-drawer-inner
   .workspace-drawer-header {
   padding-right: 0 !important;
-  padding-top: env(safe-area-inset-top, 0) !important;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 12px) !important;
 }
 
 .mk-mobile-sidepanel.is-mobile:not(.mk-spaces-right)
