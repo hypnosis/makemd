@@ -71,12 +71,12 @@
   gap: 8px;
   overflow: initial;
   padding: 0;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 .mk-focuses {
   display: flex;
   overflow: auto;
-  padding: 12px 12px 4px 12px;
+  padding: 10px 12px 4px 12px;
 }
 
 .mk-focuses-inner {
