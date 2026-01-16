@@ -417,7 +417,7 @@ body:not(.is-mobile) .mk-tree-wrapper .mk-folder-buttons {
   padding: 0 !important;
 }
 .is-mobile .workspace-leaf-content[data-type="mk-path-view"] > .view-content {
-  padding-top: 6px !important;
+  padding-top: 10px !important;
 }
 .is-mobile .mk-collapse {
   min-width: 20px !important;
