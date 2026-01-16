@@ -60,7 +60,12 @@
 
 .is-mobile .mk-focuses {
     box-shadow: var(--mk-shadow-card);
-padding-top: calc(env(safe-area-inset-top, 0px) + 12px);
+  padding-top: calc(
+    var(--safe-area-inset-top, env(safe-area-inset-top, 0px)) + 12px
+  );
+}
+.is-mobile .mk-focuses.nav-header {
+  top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px)) !important;
 }
 .is-mobile .mk-focuses > div {
   gap: 8px;
