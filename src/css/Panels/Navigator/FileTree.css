@@ -82,9 +82,7 @@
   .workspace-drawer-inner
   .workspace-drawer-header {
   padding-right: 0 !important;
-  padding-top: calc(
-    var(--safe-area-inset-top, env(safe-area-inset-top, 0px)) + 12px
-  ) !important;
+  padding-top: 12px !important;
 }
 
 .mk-mobile-sidepanel.is-mobile:not(.mk-spaces-right)
