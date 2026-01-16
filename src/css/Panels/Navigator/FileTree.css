@@ -9,6 +9,11 @@
   display: flex !important;
   }
 
+  .mk-mobile-sidepanel.is-phone .workspace-drawer.mod-left .workspace-drawer-inner,
+  .mk-mobile-sidepanel.is-phone .workspace-drawer.mod-right .workspace-drawer-inner {
+  padding-top: env(safe-area-inset-top, 0px) !important;
+}
+
   .mk-mobile-sidepanel.is-mobile.mk-hide-ribbon:not(.mk-spaces-right)
   .workspace-drawer.mod-left
   .workspace-drawer-inner, .mk-mobile-sidepanel.is-mobile.mk-hide-ribbon.mk-spaces-right
