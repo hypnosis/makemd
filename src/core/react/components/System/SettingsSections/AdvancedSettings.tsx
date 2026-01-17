@@ -3,17 +3,17 @@ import i18n from "shared/i18n";
 import React, { useState, useEffect } from "react";
 import { useDebouncedSave } from "./hooks";
 import { SettingsProps } from "./types";
-import { SpaceFolderHidingModal } from "./SpaceFolderHidingModal";
 
 export const AdvancedSettings = ({ superstate }: SettingsProps) => {
   const { debouncedSave, immediateSave } = useDebouncedSave(superstate);
+  const plugin = (superstate.ui as any)?.mainFrame?.plugin as any;
+  
   const [defaultDateFormat, setDefaultDateFormat] = useState(superstate.settings.defaultDateFormat);
   const [defaultTimeFormat, setDefaultTimeFormat] = useState(superstate.settings.defaultTimeFormat);
   const [spaceSubFolder, setSpaceSubFolder] = useState(superstate.settings.spaceSubFolder);
   const [spacesFolder, setSpacesFolder] = useState(superstate.settings.spacesFolder);
-  const [autoApplySpaceFolderHiding, setAutoApplySpaceFolderHiding] = useState(
-    Boolean(superstate.settings.autoApplySpaceFolderHiding)
-  );
+  const [hideSpaceFolders, setHideSpaceFolders] = useState(false);
+  const [hidingStatus, setHidingStatus] = useState<string>('');
   
   // Sync state with superstate.settings when component mounts or settings change
   useEffect(() => {
@@ -21,8 +21,41 @@ export const AdvancedSettings = ({ superstate }: SettingsProps) => {
     setDefaultTimeFormat(superstate.settings.defaultTimeFormat);
     setSpaceSubFolder(superstate.settings.spaceSubFolder);
     setSpacesFolder(superstate.settings.spacesFolder);
-    setAutoApplySpaceFolderHiding(Boolean(superstate.settings.autoApplySpaceFolderHiding));
-  }, [superstate.settings]);
+    
+    // Update hiding status
+    if (plugin?.hidingManager) {
+      const isEnabled = plugin.hidingManager.isEnabled();
+      const currentPattern = plugin.hidingManager.getCurrentPattern();
+      setHideSpaceFolders(isEnabled);
+      
+      if (isEnabled && currentPattern) {
+        setHidingStatus(`Active (hiding: ${currentPattern})`);
+      } else {
+        setHidingStatus('Disabled');
+      }
+    }
+  }, [superstate.settings, plugin]);
+  
+  const toggleHiding = async () => {
+    if (!plugin?.hidingManager) return;
+    
+    try {
+      if (hideSpaceFolders) {
+        await plugin.hidingManager.disable();
+        setHideSpaceFolders(false);
+        setHidingStatus('Disabled');
+        superstate.ui.notify('Space folder hiding disabled');
+      } else {
+        await plugin.hidingManager.enable(superstate.settings.spaceSubFolder);
+        setHideSpaceFolders(true);
+        setHidingStatus(`Active (hiding: ${superstate.settings.spaceSubFolder})`);
+        superstate.ui.notify('Space folder hiding enabled');
+      }
+    } catch (error) {
+      console.error('Failed to toggle hiding:', error);
+      superstate.ui.error(error);
+    }
+  };
   return (
     <div className="mk-setting-section">
       <h2>{i18n.settings.sections.advanced}</h2>
@@ -138,46 +171,22 @@ export const AdvancedSettings = ({ superstate }: SettingsProps) => {
         <div className="mk-setting-item">
           <div className="mk-setting-item-info">
             <div className="mk-setting-item-name">
-              Reapply space folder hiding
+              Hide space folders from UI
             </div>
             <div className="mk-setting-item-description">
-              Open a popup with a dry-run preview and Apply/Undo actions.
-            </div>
-          </div>
-          <div className="mk-setting-item-control">
-            <button
-              onClick={() => {
-                superstate.ui.openModal(
-                  "Space folder hiding",
-                  <SpaceFolderHidingModal superstate={superstate} />,
-                  window
-                );
-              }}
-            >
-              Open
-            </button>
-          </div>
-        </div>
-
-        <div className="mk-setting-item">
-          <div className="mk-setting-item-info">
-            <div className="mk-setting-item-name">
-              Auto-apply space folder hiding
-            </div>
-            <div className="mk-setting-item-description">
-              When enabled, Make.md automatically updates `.obsidian/app.json` (userIgnoreFilters) and a CSS snippet when Space Folder Name changes.
-              Off by default.
+              Hides space folders from File Explorer, Search, and Quick Switcher.
+              Uses dynamic CSS (works only when plugin is enabled).
+              <br />
+              <strong>Status:</strong> {hidingStatus}
+              <br />
+              <em>Note: Graph View requires manual configuration. See documentation.</em>
             </div>
           </div>
           <div className="mk-setting-item-control">
             <input
               type="checkbox"
-              checked={autoApplySpaceFolderHiding}
-              onChange={(e) => {
-                setAutoApplySpaceFolderHiding(e.target.checked);
-                superstate.settings.autoApplySpaceFolderHiding = e.target.checked;
-                immediateSave();
-              }}
+              checked={hideSpaceFolders}
+              onChange={toggleHiding}
             />
           </div>
         </div>
