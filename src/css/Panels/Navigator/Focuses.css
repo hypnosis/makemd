@@ -59,13 +59,16 @@
 }
 
 .is-mobile .mk-focuses {
-    box-shadow: var(--mk-shadow-card);
+  box-shadow: var(--mk-shadow-card);
   padding-top: calc(
-    var(--safe-area-inset-top, env(safe-area-inset-top, 0px)) + 16px
+    var(--safe-area-inset-top, env(safe-area-inset-top, 0px)) + 12px
   );
+  padding-bottom: 8px;
 }
 .is-mobile .mk-focuses.nav-header {
-  top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px)) !important;
+  top: 0 !important;
+  background-color: var(--background-primary);
+  z-index: 10;
 }
 .is-mobile .mk-focuses > div {
   gap: 8px;
