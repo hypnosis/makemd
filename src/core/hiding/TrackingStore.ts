@@ -6,7 +6,7 @@
  */
 
 import { DataAdapter } from 'obsidian';
-import { safelyParseJSON } from 'shared/utils/strings';
+import { safelyParseJSON } from 'shared/utils/json';
 
 export interface HidingState {
   version: string;

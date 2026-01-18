@@ -5,5 +5,6 @@
  */
 
 export { DynamicCSSManager } from './DynamicCSSManager';
-export { TrackingStore, HidingState } from './TrackingStore';
+export { TrackingStore } from './TrackingStore';
+export type { HidingState } from './TrackingStore';
 export { SpaceFolderHidingManager } from './SpaceFolderHidingManager';

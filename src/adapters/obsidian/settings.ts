@@ -3,8 +3,6 @@ import { App, PluginSettingTab, Setting } from "obsidian";
 import t from "shared/i18n";
 import MakeMDPlugin from "../../main";
 import { MakeMDSettings } from "../../shared/types/settings";
-import React from "react";
-import { SpaceFolderHidingModal } from "core/react/components/System/SettingsSections/SpaceFolderHidingModal";
 
 type SettingObject = {
   name: keyof MakeMDSettings;
@@ -394,11 +392,6 @@ export class MakeMDPluginSettingsTab extends PluginSettingTab {
         type: 'text',
       },
       {
-        name: 'autoApplySpaceFolderHiding',
-        category: 'advanced',
-        type: 'boolean',
-      },
-      {
         name: 'spacesFolder',
         category: 'advanced',
         type: 'text',
@@ -495,16 +488,33 @@ export class MakeMDPluginSettingsTab extends PluginSettingTab {
         if (setting.category === category && !setting.subCategory) {
           insertSetting(containerEl, setting);
           if (category === "advanced" && setting.name === "spaceSubFolder") {
-            const s = new Setting(containerEl)
-              .setName("Reapply space folder hiding")
-              .setDesc("Open a popup with Dry-run preview and Apply/Undo actions for Obsidian config + CSS snippet.");
-            s.addButton((btn) =>
-              btn.setButtonText("Open").onClick(() => {
-                this.plugin.superstate.ui.openModal(
-                  "Space folder hiding",
-                  React.createElement(SpaceFolderHidingModal, { superstate: this.plugin.superstate }),
-                  window
-                );
+            // Hide space folders toggle
+            const hidingManager = this.plugin.hidingManager;
+            const isEnabled = hidingManager?.isEnabled() ?? false;
+            const currentPattern = hidingManager?.getCurrentPattern();
+            
+            const hidingSetting = new Setting(containerEl)
+              .setName("Hide space folders from UI")
+              .setDesc(
+                "Hides space folders from File Explorer, Search, and Quick Switcher. " +
+                "Uses dynamic CSS (works only when plugin is enabled). " +
+                "Status: " + (isEnabled && currentPattern ? `Active (hiding: ${currentPattern})` : "Disabled") + ". " +
+                "Note: Graph View requires manual configuration."
+              );
+            
+            hidingSetting.addToggle((toggle) =>
+              toggle.setValue(isEnabled).onChange(async (value: boolean) => {
+                try {
+                  if (value) {
+                    await hidingManager?.enable(this.plugin.superstate.settings.spaceSubFolder);
+                  } else {
+                    await hidingManager?.disable();
+                  }
+                  // Refresh settings display
+                  this.display();
+                } catch (err) {
+                  console.error("Failed to toggle hiding:", err);
+                }
               })
             );
           }
