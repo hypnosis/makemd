@@ -77,6 +77,7 @@ export interface MakeMDSettings {
   showSpacePinIcon: boolean;
   experimental: boolean;
   systemName: string;
+  systemNameCustomized: boolean;
   defaultSpaceTemplate: string;
   selectedKit: string;
   actionMaxSteps: number;

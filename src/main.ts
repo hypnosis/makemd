@@ -673,12 +673,6 @@ this.markdownAdapter = new ObsidianMarkdownFiletypeAdapter(this);
     await this.hidingManager.initialize();
     
     this.superstate.ui.notify(`Make.md - Plugin loaded in ${(Date.now()-start)/1000} seconds`, 'console');
-
-    if (this.superstate.settings.systemName == 'Vault') {
-    this.superstate.settings.systemName = this.app.vault.getName();
-    this.saveSettings();
-    } 
-    
   }
 
   
@@ -785,6 +779,15 @@ this.markdownAdapter = new ObsidianMarkdownFiletypeAdapter(this);
     this.superstate.settings.newFileFolderPath = userConfig.newFileFolderPath;
     this.superstate.settings.newFileLocation = userConfig.newFileLocation;
     this.lastSpaceSubFolder = this.superstate.settings.spaceSubFolder;
+    
+    // Sync systemName with vault name if not customized by user
+    if (!this.superstate.settings.systemNameCustomized) {
+      const currentVaultName = this.app.vault.getName();
+      if (this.superstate.settings.systemName !== currentVaultName) {
+        this.superstate.settings.systemName = currentVaultName;
+      }
+    }
+    
     this.saveSettings();
   }
 

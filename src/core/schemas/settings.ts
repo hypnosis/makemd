@@ -78,6 +78,7 @@ export const DEFAULT_SETTINGS: MakeMDSettings = {
   showSpacePinIcon: true,
   experimental: false,
   systemName: i18n.settings.vault,
+  systemNameCustomized: false,
   defaultSpaceTemplate: "",
   selectedKit: "default",
   actionMaxSteps: 100,
