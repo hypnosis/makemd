@@ -544,6 +544,11 @@ export const ContextEditorProvider: React.FC<
       return;
     }
     const currentData = data[index];
+    if (!currentData) {
+      // Index out of bounds, treat as new row
+      saveDB(createNewRow(tableData, row));
+      return;
+    }
     const changedCols = Object.keys(row).filter(
       (f) => row[f] != currentData[f]
     );

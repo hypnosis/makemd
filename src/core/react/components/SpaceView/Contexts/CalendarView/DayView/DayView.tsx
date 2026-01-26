@@ -572,6 +572,7 @@ export const DayView = (props: {
                 item={props.data[event.index]}
                 hourHeight={hourHeight}
                 startHour={startHour}
+                endHour={endHour}
                 updateStartEnd={(startOffset, endOffset) => {
                   const newStart = add(date, {
                     minutes: startOffset,
@@ -622,6 +623,7 @@ export const DayView = (props: {
                 item={{}}
                 hourHeight={hourHeight}
                 startHour={startHour}
+                endHour={endHour}
                 clone
               ></DayItem>
             )}
@@ -646,6 +648,7 @@ export const DayView = (props: {
               item={props.data[active]}
               hourHeight={hourHeight}
               startHour={startHour}
+              endHour={endHour}
               clone
             ></DayItem>
           ) : overPath ? (
@@ -661,6 +664,7 @@ export const DayView = (props: {
                 columnTotal: 1,
               }}
               startHour={props.startHour}
+              endHour={endHour}
               item={{
                 [PathPropertyName]: overPath,
               }}

@@ -20,41 +20,38 @@ export const FrameDraggableHandle = (props: {
   const startValue = useRef(props.value);
   const currentValue = useRef(props.value);
 
-  const [, setStartPos] = useState<[number, number]>([0, 0]);
+  const startPosRef = useRef<[number, number]>([0, 0]);
   const step = props.step ?? 1;
   const handleMove = useCallback(
     (e: MouseEvent) => {
-      setStartPos((pos) => {
-        const { clientX: x2, clientY: y2 } = e;
-        const [x1, y1] = pos;
+      const { clientX: x2, clientY: y2 } = e;
+      const [x1, y1] = startPosRef.current;
 
-        const a = props.reverseX ? x1 - x2 : x2 - x1;
-        const b = props.reverseY ? y2 - y1 : y1 - y2;
+      const a = props.reverseX ? x1 - x2 : x2 - x1;
+      const b = props.reverseY ? y2 - y1 : y1 - y2;
 
-        const mod = props.mod ?? 1;
+      const mod = props.mod ?? 1;
 
-        const stepModifer = step * mod;
+      const stepModifer = step * mod;
 
-        let delta = Math.sqrt((((a + b) / 2) * (a + b)) / 2) * stepModifer;
-        if (a + b < 0) delta = -delta;
+      let delta = Math.sqrt((((a + b) / 2) * (a + b)) / 2) * stepModifer;
+      if (a + b < 0) delta = -delta;
 
-        if (props.disableX) delta = b * stepModifer;
-        if (props.disableY) delta = a * stepModifer;
-        let newValue = startValue.current + delta;
+      if (props.disableX) delta = b * stepModifer;
+      if (props.disableY) delta = a * stepModifer;
+      let newValue = startValue.current + delta;
 
-        newValue = props.min != null ? Math.max(newValue, props.min) : newValue;
-        newValue = props.max != null ? Math.min(newValue, props.max) : newValue;
-        currentValue.current = newValue;
+      newValue = props.min != null ? Math.max(newValue, props.min) : newValue;
+      newValue = props.max != null ? Math.min(newValue, props.max) : newValue;
+      currentValue.current = newValue;
 
-        props.onDragMove(newValue, {
-          ctrlKey: e.ctrlKey,
-          metaKey: e.metaKey,
-          altKey: e.altKey,
-          shiftKey: e.shiftKey,
-        });
-
-        return pos;
+      props.onDragMove(newValue, {
+        ctrlKey: e.ctrlKey,
+        metaKey: e.metaKey,
+        altKey: e.altKey,
+        shiftKey: e.shiftKey,
       });
+
       e.stopPropagation();
     },
     [modifier, props.max, props.min, step, props.onDragMove, props.mod]
@@ -90,7 +87,7 @@ export const FrameDraggableHandle = (props: {
     (e: React.MouseEvent<HTMLElement>) => {
       startValue.current = props.value;
 
-      setStartPos([e.clientX, e.clientY]);
+      startPosRef.current = [e.clientX, e.clientY];
 
       document.addEventListener("mousemove", handleMove);
       document.addEventListener("mouseup", handleMoveEnd);

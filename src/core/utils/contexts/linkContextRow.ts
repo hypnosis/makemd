@@ -107,11 +107,19 @@ const resolvedPath = resolvePath(_row[PathPropertyName], path?.path, (spacePath)
 }
 
 export const mergeContextRows = ( paths: string[], rows: DBRows, pathStates: Map<string, PathState>, spaceMap: IndexMap, path: PathState) => {
-  
-  const contextPaths = uniq(rows.map(f => resolvePath(f[PathPropertyName], path?.path, (spacePath) => pathStates.get(spacePath)?.type == 'space')).filter(f => paths.includes(f)));
-  const missingPaths = paths.filter(f => !contextPaths.includes(f));
-      
-      return [...contextPaths.map(g => rows.find(f => resolvePath(f[PathPropertyName], path?.path, (spacePath) => pathStates.get(spacePath)?.type == 'space') == g)), ...missingPaths.map(f => ({[PathPropertyName]: f}))]
+
+  // Filter existing rows to only include valid paths, preserving database order (rank)
+  const validRows = rows.filter(row => {
+    const resolvedPath = resolvePath(row[PathPropertyName], path?.path, (spacePath) => pathStates.get(spacePath)?.type == 'space');
+    return paths.includes(resolvedPath);
+  });
+
+  // Find paths that are in the paths array but not in any existing row
+  const existingPaths = validRows.map(row => resolvePath(row[PathPropertyName], path?.path, (spacePath) => pathStates.get(spacePath)?.type == 'space'));
+  const missingPaths = paths.filter(f => !existingPaths.includes(f));
+
+  // Return existing rows (in their original order) plus new rows for missing paths
+  return [...validRows, ...missingPaths.map(f => ({[PathPropertyName]: f}))];
 
 }
 export const linkContextRow = (

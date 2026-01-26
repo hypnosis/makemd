@@ -28,6 +28,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { flushSync } from "react-dom";
 import { PathState, SpaceState } from "shared/types/PathState";
 import { Pos } from "shared/types/Pos";
 import { SpaceSort } from "shared/types/spaceDef";
@@ -55,7 +56,9 @@ const treeForSpace = (
 ) => {
   const tree: TreeNode[] = [];
   const id = parentId ? parentId + "/" + space.path : space.path;
-  const spaceCollapsed = !expandedSpaces.includes(id) || activeId == id;
+  // Only check expandedSpaces - don't force collapse based on activeId
+  // This fixes the issue where folders with folder notes couldn't be expanded
+  const spaceCollapsed = !expandedSpaces.includes(id);
   const spaceSort =
     space.metadata?.sort?.field && !sort.recursive
       ? space.metadata?.sort
@@ -270,6 +273,7 @@ export const SpaceTreeComponent = (props: SpaceTreeComponentProps) => {
   const [active, setActive] = useState<TreeNode>(null);
   const [overId, setOverId] = useState<string>(null);
   const [flattenedTree, setFlattenedTree] = useState<TreeNode[]>([]);
+  const treeRef = useRef<HTMLDivElement>(null);
   const nextTreeScrollPath = useRef(null);
   const [presetRowHeight, setPresetRowHeight] = useState<number>(
     isTouchScreen(props.superstate.ui)
@@ -319,9 +323,15 @@ export const SpaceTreeComponent = (props: SpaceTreeComponentProps) => {
   }, [activePath]);
 
   useEffect(() => {
-    window.addEventListener("dragend", resetState);
+    const handleDragEnd = () => {
+      // Don't reset if we're in the middle of a drop operation
+      if (!isDropping.current) {
+        resetState();
+      }
+    };
+    window.addEventListener("dragend", handleDragEnd);
     return () => {
-      window.removeEventListener("dragend", resetState);
+      window.removeEventListener("dragend", handleDragEnd);
     };
   });
   // Persistant Settings
@@ -347,10 +357,19 @@ export const SpaceTreeComponent = (props: SpaceTreeComponentProps) => {
 
   const revealPath = useCallback(
     (path: string) => {
-      const parentSpaces =
+      let parentSpaces =
         activeViewSpaces?.filter(
           (f) => path?.startsWith(f?.path) || f?.path == "/"
         ) ?? [];
+
+      // If file not in current focus's spaces, check if "/" space is available
+      // and add it to allow revealing files from any focus
+      if (parentSpaces.length == 0) {
+        const rootSpace = superstate.pathsIndex.get("/");
+        if (rootSpace) {
+          parentSpaces = [rootSpace];
+        }
+      }
       if (!path || parentSpaces.length == 0) return;
 
       let newOpenFolders = expandedSpaces;
@@ -421,7 +440,17 @@ export const SpaceTreeComponent = (props: SpaceTreeComponentProps) => {
     };
     const spaceUpdated = (payload: { path: string }) => {
       if (refreshableSpaces.some((f) => f == payload.path)) {
-        reloadData();
+        if (pendingReset.current) {
+          // Batch data reload with state reset to prevent intermediate render
+          pendingReset.current = false;
+          flushSync(() => {
+            reloadData();
+            resetState();
+          });
+          treeRef.current?.classList.remove('mk-dropping');
+        } else {
+          reloadData();
+        }
       }
     };
 
@@ -454,6 +483,7 @@ export const SpaceTreeComponent = (props: SpaceTreeComponentProps) => {
     );
     setFlattenedTree(tree);
   }, [expandedSpaces, activeViewSpaces, active]);
+
   const changeActivePath = (path: string) => {
     setActivePath(path);
   };
@@ -611,9 +641,12 @@ export const SpaceTreeComponent = (props: SpaceTreeComponentProps) => {
     }
   }, [dragPaths]);
 
-  const dragEnded = (e: React.DragEvent<HTMLDivElement>, overId: string) => {
+  const dragEnded = async (e: React.DragEvent<HTMLDivElement>, overId: string) => {
+    isDropping.current = true;
+    pendingReset.current = true;
+    treeRef.current?.classList.add('mk-dropping');
     const modifiers = eventToModifier(e);
-    dropPathsInTree(
+    await dropPathsInTree(
       superstate,
       dragPaths,
       active?.id,
@@ -623,7 +656,17 @@ export const SpaceTreeComponent = (props: SpaceTreeComponentProps) => {
       activeViewSpaces,
       modifiers
     );
-    resetState();
+    isDropping.current = false;
+    // Fallback reset in case spaceStateUpdated doesn't fire
+    setTimeout(() => {
+      if (pendingReset.current) {
+        pendingReset.current = false;
+        flushSync(() => {
+          resetState();
+        });
+        treeRef.current?.classList.remove('mk-dropping');
+      }
+    }, 200);
   };
 
   const handleCollapse = useCallback(
@@ -654,6 +697,8 @@ export const SpaceTreeComponent = (props: SpaceTreeComponentProps) => {
   }
 
   const dragCounter = useRef(0);
+  const isDropping = useRef(false);
+  const pendingReset = useRef(false);
 
   const dragEnter = () => {
     dragCounter.current++;
@@ -677,7 +722,8 @@ export const SpaceTreeComponent = (props: SpaceTreeComponentProps) => {
 
   return (
     <div
-      className={`mk-path-tree`}
+      ref={treeRef}
+      className="mk-path-tree"
       onDragEnter={() => dragEnter()}
       onDragLeave={() => dragLeave()}
       onDragOver={(e) => e.preventDefault()}
@@ -745,9 +791,7 @@ export const SpaceTreeComponent = (props: SpaceTreeComponentProps) => {
           }}
         >
           <div>
-            {i18n.hintText.dragDropModifierKeys
-              .replace("${1}", "shift")
-              .replace("${2}", normalizedAltName())}
+            {i18n.hintText.dragDropModifierKeys}
           </div>
         </div>
       )}

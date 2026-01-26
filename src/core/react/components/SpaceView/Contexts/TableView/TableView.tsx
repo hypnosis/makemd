@@ -664,19 +664,31 @@ export const TableView = (props: { superstate: Superstate }) => {
             ))}
           </thead>
           <tbody>
-            {table.getRowModel().rows.map((row) => (
+            {table.getRowModel().rows.map((row) => {
+              // Use row.original for reliable access to the row data
+              // row.original is the actual data object from the data array
+              const rowData = row.original as DBRow;
+              const rowOriginalIndex = rowData?.["_index"];
+
+              return (
               <tr
                 className={
                   selectedRows?.some(
-                    (f) => f == (data[row.index] as DBRow)["_index"]
+                    (f) => f == rowOriginalIndex
                   )
                     ? "mk-active"
                     : undefined
                 }
                 onContextMenu={(e) => {
-                  const rowIndex = parseInt(
-                    (data[row.index] as DBRow)["_index"]
-                  );
+                  // Skip context menu for group header rows (they don't have _index)
+                  if (rowOriginalIndex === undefined) {
+                    return;
+                  }
+                  const rowIndex = parseInt(rowOriginalIndex);
+                  if (isNaN(rowIndex)) {
+                    console.warn("Invalid row index:", rowOriginalIndex);
+                    return;
+                  }
                   showRowContextMenu(
                     e,
                     props.superstate,
@@ -763,7 +775,8 @@ export const TableView = (props: { superstate: Superstate }) => {
                   )
                 )}
               </tr>
-            ))}
+            );
+            })}
           </tbody>
           <tfoot>
             {table.getCanNextPage() && (

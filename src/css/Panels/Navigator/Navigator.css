@@ -125,6 +125,10 @@ margin-left: 6px;
   transition: transform .2s ease;
 }
 
+.mk-dropping .mk-tree-wrapper > div {
+  transition: none !important;
+}
+
 .mk-focuses {
   position: relative;
   

@@ -6,7 +6,7 @@ export const en = {
     "selectNote": "Select Note...",
     "createListItem": "Create List Item",
     "dragDropProperties": "Drag and drop to reorder properties",
-    "dragDropModifierKeys": "Hold Shift to select multiple items",
+    "dragDropModifierKeys": "Hold Alt to copy",
     "hiddenExtensionsPlaceholder": "e.g., .mdb, _assets, _blocks"
   },
   "timeUnits": {
