@@ -60,15 +60,7 @@
 
 .is-mobile .mk-focuses {
   box-shadow: var(--mk-shadow-card);
-  padding-top: calc(
-    var(--safe-area-inset-top, env(safe-area-inset-top, 0px)) + 12px
-  );
-  padding-bottom: 8px;
-}
-.is-mobile .mk-focuses.nav-header {
-  top: 0 !important;
-  background-color: var(--background-primary);
-  z-index: 10;
+  padding-top: 12px;
 }
 .is-mobile .mk-focuses > div {
   gap: 8px;
@@ -79,14 +71,19 @@
 .mk-focuses {
   display: flex;
   overflow: auto;
-  padding: 12px 12px 6px 12px;
+  padding: 12px 12px 4px 12px;
 }
 
 .mk-focuses-inner {
   flex-wrap: wrap;
   gap: 4px;
   display: flex;
-    justify-content: center;
+  justify-content: center;
+}
+
+.is-mobile .mk-focuses-inner {
+  min-height: 60px;
+  align-items: center;
 }
 
 .mk-sidebar-expanded {
@@ -96,6 +93,7 @@
 .mk-waypoint:hover .mk-focuses-item:not(.mk-active) {
   background: var(--nav-item-background-hover);
 }
+
 .mk-focuses-item {
   color: var(--mk-ui-text-secondary);
   height: 30px;
@@ -107,9 +105,9 @@
   gap: 4px;
   text-align: center;
   color: var(--icon-color);
-  
   transition: transform 250ms ease;
 }
+
 .mk-focuses-item svg, .mk-waypoint-new svg {
   width: var(--icon-size);
   height: var(--icon-size);
@@ -124,15 +122,6 @@
 .is-mobile .mk-focuses-item svg, .is-mobile .mk-waypoint-new svg {
   width: 22px;
   height: 22px;
-}
-
-.is-mobile .mk-focuses {
-  min-height: 60px;
-}
-
-.is-mobile .mk-focuses-inner {
-  min-height: 60px;
-  align-items: center;
 }
 
 
