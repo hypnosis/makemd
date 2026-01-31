@@ -121,6 +121,20 @@
   border-radius: 20px;
 }
 
+.is-mobile .mk-focuses-item svg, .is-mobile .mk-waypoint-new svg {
+  width: 22px;
+  height: 22px;
+}
+
+.is-mobile .mk-focuses {
+  min-height: 60px;
+}
+
+.is-mobile .mk-focuses-inner {
+  min-height: 60px;
+  align-items: center;
+}
+
 
 .mk-focuses-item.mk-active {
   --label-color: var(--mk-ui-background-selected);

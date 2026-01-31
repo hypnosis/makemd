@@ -444,11 +444,13 @@ export const PropertyValueComponent = (props: {
     const options = parseOptions(parsedValue.options ?? []);
 
     const saveOptionsHandler = (newOptions: SelectOption[], colorScheme?: string) => {
-      const updated: Record<string, any> = { ...parsedValue, options: newOptions };
+      // Save both options and colorScheme in a single call to avoid race condition
+      // where the second saveParsedValue would overwrite the first
+      const updates: Record<string, any> = { options: newOptions };
       if (colorScheme !== undefined) {
-        updated.colorScheme = colorScheme;
+        updates.colorScheme = colorScheme;
       }
-      props.saveValue(JSON.stringify(updated));
+      props.saveValue(JSON.stringify({ ...parsedValue, ...updates }));
     };
 
     props.superstate.ui.openModal(

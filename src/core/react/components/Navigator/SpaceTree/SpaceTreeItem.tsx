@@ -137,7 +137,8 @@ export const TreeItem = (props: TreeItemProps) => {
       if (superstate.settings.expandFolderOnClick) {
         if (collapsed) {
           onCollapse(data, true);
-        } else if (active || selected) {
+        } else if (selected) {
+          // Only collapse if already selected, so first click selects, second click collapses
           onCollapse(data, false);
         }
       }
@@ -218,6 +219,7 @@ export const TreeItem = (props: TreeItemProps) => {
     noClick: true,
   });
   const onDragEnded = (e: React.DragEvent<HTMLDivElement>) => {
+    e.stopPropagation();
     dragEnded(e, data.id);
   };
   const mouseOut = (e: React.MouseEvent) => {

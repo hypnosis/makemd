@@ -95,7 +95,8 @@ const saveContext = async (
 ): Promise<void> => {
   await manager.saveTable(spaceInfo.path, newTable, forceCreate).then(f => {
     if (f)
-    return manager.superstate.reloadContextByPath(spaceInfo.path, { force: forceCreate, calculate })
+    // Always force reload after save to ensure UI updates
+    return manager.superstate.reloadContextByPath(spaceInfo.path, { force: true, calculate })
   return f});
 };
 

@@ -35,8 +35,12 @@ const simpleSort = (a: any, b: any) => {
   return 0;
 };
 
-const stringSort = (value: string, filterValue: string): SortResultType =>
-  value.localeCompare(filterValue, undefined, { numeric: true,  sensitivity: "base" }) as SortResultType;
+const stringSort = (value: string, filterValue: string): SortResultType => {
+  if (value == null && filterValue == null) return 0;
+  if (value == null) return 1;
+  if (filterValue == null) return -1;
+  return (value ?? '').localeCompare(filterValue ?? '', undefined, { numeric: true, sensitivity: "base" }) as SortResultType;
+};
 
 /**
  * Sort option fields based on their defined order
@@ -71,6 +75,9 @@ const linkSort: SortFunction = (
   value: string,
   filterValue: string
 ): SortResultType => {
+  if (value == null && filterValue == null) return 0;
+  if (value == null) return 1;
+  if (filterValue == null) return -1;
   const a = value.split("/").pop();
   const b = filterValue.split("/").pop();
   return stringSort(a, b);

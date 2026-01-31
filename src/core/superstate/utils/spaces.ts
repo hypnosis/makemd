@@ -198,7 +198,6 @@ export const updatePathRankInSpace = async (
 if (!spaceState) return;
 
     const fixedRank = rank;
-    // if (parseInt(item.rank) > rank) fixedRank = rank + 1;
     superstate.addToContextStateQueue(() => reorderPathsInContext(superstate.spaceManager, [path], fixedRank, spaceState.space).then(f => {
       const promises = [...superstate.spacesMap.getInverse(spaceState.path)].map(f => superstate.reloadPath(f));
     return Promise.all(promises);

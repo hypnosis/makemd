@@ -1,16 +1,20 @@
 {
   "name": "make-md",
-  "version": "1.3.2",
+  "version": "1.3.4",
   "description": "make.md",
   "main": "main.js",
   "scripts": {
-    "dev": "node esbuild.config.mjs",
-    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
-    "preview": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs preview",
-    "demo": "&& node esbuild.config.mjs demo",
+    "sync-version": "node scripts/sync-version.mjs",
+    "dev": "npm run sync-version && node esbuild.config.mjs",
+    "build": "npm run sync-version && tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+    "preview": "npm run sync-version && tsc -noEmit -skipLibCheck && node esbuild.config.mjs preview",
+    "demo": "npm run sync-version && node esbuild.config.mjs demo",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "version": "npm run sync-version && git add manifest.json",
+    "publish": "node scripts/publish.mjs",
+    "release": "node scripts/release.mjs"
   },
   "keywords": [],
   "author": "",

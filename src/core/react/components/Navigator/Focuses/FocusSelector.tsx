@@ -193,12 +193,12 @@ export const FocusSelector = (props: { superstate: Superstate }) => {
   return (
     <>
       <div
-        className="mk-focuses nav-header"
+        className="mk-focuses"
         onDragEnter={() => dragEnter()}
         onDragLeave={() => dragLeave()}
         onDragOver={(e) => e.preventDefault()}
       >
-        <div className="mk-focuses-inner nav-buttons-container">
+        <div className="mk-focuses-inner">
           {focuses.map((pin, i) => (
             <SortablePinnedSpaceItem
               id={i}

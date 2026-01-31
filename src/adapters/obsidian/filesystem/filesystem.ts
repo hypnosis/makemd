@@ -369,8 +369,12 @@ const oldCache = this.cache.get(oldPath);
             }
             if (!newFile) return;
             
+            // Deep clone the original cache to avoid shared references
+            // (fixes bug where template changes sync back to new files)
+            const originalCache = this.cache.get(file.path);
+            const clonedCache = originalCache ? JSON.parse(JSON.stringify(originalCache)) : {};
             this.cache.set(newFile.path, {
-                ...this.cache.get(file.path),
+                ...clonedCache,
                 file: newFile,
                 ctime: newFile.ctime,
                 label: {...this.cache.get(path)?.label, name:newFile.name} as PathLabel,

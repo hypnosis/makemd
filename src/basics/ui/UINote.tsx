@@ -109,7 +109,12 @@ export const UINote = forwardRef((props: NoteViewProps, ref) => {
       <div
         className={`${props.classname ?? ""} mk-flowspace-editor`}
         ref={flowRef}
-        onClick={(e) => e.stopPropagation()}
+        onMouseDown={(e) => {
+          // Only stop propagation for clicks directly on the container, not on editor content
+          if (e.target === e.currentTarget) {
+            e.stopPropagation();
+          }
+        }}
       ></div>
 
       {existsPas ? (

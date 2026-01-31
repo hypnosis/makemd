@@ -323,7 +323,7 @@ loadViews () {
     if (activeView.getViewType() == SPACE_VIEW_TYPE ) {
       modifyTabSticker(this)
       state = activeView.getState();
-      filePath =  activeView.getState().path
+      filePath =  activeView.getState().path as string
       
     } else if (activeView.getViewType() == "markdown") {
       filePath = activeView.file.path;

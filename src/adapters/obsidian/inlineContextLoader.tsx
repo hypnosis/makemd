@@ -33,6 +33,12 @@ export const modifyFlowDom = (plugin: MakeMDPlugin) => {
       }
     }
 
+    // Skip re-rendering if already rendered for this path
+    if (inlineContext.getAttribute("data-path") === file.path) {
+      return;
+    }
+    inlineContext.setAttribute("data-path", file.path);
+
     const construct = (root: Root) => {
       root.render(
         <SpaceManagerProvider superstate={plugin.superstate}>

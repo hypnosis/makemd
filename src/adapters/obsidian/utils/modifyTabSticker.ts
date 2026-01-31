@@ -28,7 +28,7 @@ export const modifyTabSticker = (plugin: MakeMDPlugin) => {
   } else {
     leaf = plugin.app.workspace.getActiveViewOfType(SpaceViewContainer)?.leaf;
     if (leaf) {
-      const spacePath = leaf.view.getState().path;
+      const spacePath = leaf.view.getState().path as string;
 
       const fileCache = plugin.superstate.pathsIndex.get(spacePath);
       if (fileCache?.label?.sticker && leaf.tabHeaderInnerIconEl) {

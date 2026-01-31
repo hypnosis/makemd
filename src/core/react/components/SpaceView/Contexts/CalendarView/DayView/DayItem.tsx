@@ -20,12 +20,13 @@ export const DayItem = (props: {
   item: DBRow;
   hourHeight: number;
   startHour: number;
+  endHour?: number;
   clone?: boolean;
   updateStartEnd?: (startOffset: number, endOffset: number) => void;
   style?: React.CSSProperties;
   editRepeat?: (e: React.MouseEvent) => void;
 }) => {
-  const { event, hourHeight, startHour } = props;
+  const { event, hourHeight, startHour, endHour = 24 } = props;
   const { pathState } = useContext(PathContext);
   const { spaceState } = useContext(SpaceContext);
   
@@ -175,17 +176,21 @@ export const DayItem = (props: {
                 reverseY={true}
                 disableX={true}
                 step={60 / hourHeight}
+                min={startHour * 60}
+                max={displayEvent.endOffset - 15}
                 onDragMove={(value) => {
+                  const clampedValue = Math.max(startHour * 60, Math.min(value, displayEvent.endOffset - 15));
                   const newIntermediate = {
                     ...event,
-                    startOffset: Math.round(value / 15) * 15,
+                    startOffset: Math.round(clampedValue / 15) * 15,
                   };
                   setIntermediate(newIntermediate);
                 }}
                 onDragEnd={(value) => {
+                  const clampedValue = Math.max(startHour * 60, Math.min(value, displayEvent.endOffset - 15));
                   if (props.updateStartEnd)
                     props.updateStartEnd(
-                      Math.round(value / 15) * 15,
+                      Math.round(clampedValue / 15) * 15,
                       displayEvent.endOffset
                     );
                   setIntermediate(null);
@@ -199,18 +204,22 @@ export const DayItem = (props: {
                 reverseY={true}
                 disableX={true}
                 step={60 / hourHeight}
+                min={displayEvent.startOffset + 15}
+                max={endHour * 60}
                 onDragMove={(value) => {
+                  const clampedValue = Math.max(displayEvent.startOffset + 15, Math.min(value, endHour * 60));
                   const newIntermediate = {
                     ...event,
-                    endOffset: Math.round(value / 15) * 15,
+                    endOffset: Math.round(clampedValue / 15) * 15,
                   };
                   setIntermediate(newIntermediate);
                 }}
                 onDragEnd={(value) => {
+                  const clampedValue = Math.max(displayEvent.startOffset + 15, Math.min(value, endHour * 60));
                   if (props.updateStartEnd)
                     props.updateStartEnd(
                       displayEvent.startOffset,
-                      Math.round(value / 15) * 15
+                      Math.round(clampedValue / 15) * 15
                     );
                   setIntermediate(null);
                 }}

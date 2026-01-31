@@ -285,7 +285,11 @@ export const FrameEditorInstance = (
               {instance.exec.node.name}
             </div>
           )}
-          {instance.exec.children.length == 0 && frameSchema.id == "main" && (
+          {/* Only show "Add View" when frame data is loaded but truly empty
+              (nodes.length <= 1 means only root node exists, no content) */}
+          {instance.exec.children.length == 0 &&
+           frameSchema.id == "main" &&
+           nodes.length <= 1 && (
             <button
               onClick={() => {
                 props.superstate.spaceManager.saveFrame(

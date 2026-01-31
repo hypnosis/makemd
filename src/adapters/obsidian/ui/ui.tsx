@@ -398,7 +398,7 @@ export class ObsidianUI implements UIAdapter {
         })
         .map((f) => {
           return {
-            path: f.view.file?.path,
+            path: f.view.file?.path as string,
             openPath: (path: string) => {
               f.openFile(abstractFile as TFile);
             },
@@ -414,7 +414,7 @@ export class ObsidianUI implements UIAdapter {
         })
         .map((f) => {
           return {
-            path: f.view.getState().path,
+            path: f.view.getState().path as string,
             openPath: (path: string) => {
               f.setViewState({
                 type: SPACE_VIEW_TYPE,

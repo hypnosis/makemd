@@ -27,7 +27,7 @@ export const SpaceHeader = (props: { superstate: Superstate }) => {
   const [templates, setTemplates] = React.useState<string[]>([]);
   useEffect(() => {
     refreshData({ path: pathState?.path });
-  }, []);
+  }, [pathState?.path]);
   useEffect(() => {
     if (spaceState)
       setTemplates(
@@ -73,7 +73,7 @@ export const SpaceHeader = (props: { superstate: Superstate }) => {
         ></BannerView>
       )}
       {spaceState && (
-        <div className="mk-space-header">
+        <div key={spaceState.path} className="mk-space-header">
           <div className="mk-path-context-label">
             <TitleComponent
               superstate={props.superstate}
@@ -122,7 +122,7 @@ export const SpaceHeader = (props: { superstate: Superstate }) => {
               close={() => setExpandedSection(null)}
             />
           ) : null}
-          
+
         </div>
       )}
     </>

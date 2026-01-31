@@ -160,7 +160,7 @@ public api: API;
     }
     public reindexSearch () {
         this.indexer.reload<Record<string, unknown>>({ type: 'index', path: ''}).then(r => {
-            this.searchIndex = Fuse.parseIndex(r);
+            this.searchIndex = Fuse.parseIndex(r as any);
         });
     }
     private constructor(public indexVersion: string, public onChange: () => void, spaceManager: SpaceManager, uiManager: UIManager, commandsManager: CLIManager) {
@@ -620,11 +620,17 @@ public api: API;
             this.spacesMap.deleteInverse(oldPath)
             this.linksMap.delete(oldPath)
             this.linksMap.deleteInverse(oldPath)
+            this.tagsMap.delete(oldPath)
             this.pathsIndex.delete(oldPath);
 
             const allContextsWithPath = oldSpaces.map(f => this.spacesIndex.get(f)).filter(f => f);
-            
+
+            // Index the new path FIRST so it's available when contexts reload
+            await this.reloadPath(newFilePath, true)
+
             await renamePathInContexts(this.spaceManager, oldPath, newFilePath, allContextsWithPath.map(f => f.space))
+            // Remove any orphaned old path entries
+            await removePathInContexts(this.spaceManager, oldPath, allContextsWithPath.map(f => f.space))
             for(const space of allContextsWithPath) {
                 if (space.metadata?.links?.includes(oldPath)) {
                     this.addToContextStateQueue(() => saveSpaceMetadataValue(this, space.path, "links", space.metadata.links.map(f => f == oldPath ? newPath : f)))
@@ -654,8 +660,8 @@ public api: API;
         
         
         await this.reloadPath(newPath, true)
-        
-        
+        this.persister.remove(oldPath, 'path');
+
         const changedSpaces = uniq([...(this.spacesMap.get(newPath) ?? []), ...oldSpaces]);
         //reload contexts to calculate proper paths
         const cachedPromises = changedSpaces.map(f => this.reloadContext(this.spacesIndex.get(f)?.space, { force: false, calculate: true }));
